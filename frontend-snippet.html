@@ -1,0 +1,65 @@
+<!-- Paste this section wherever you want the "request any tool free" form -->
+<section id="tool-request">
+  <div class="section-head reveal in tilt-scroll" data-depth="0.7" data-axis="x">
+    <h2>Get Any Tool, Automation or n8n Workflow — Free</h2>
+    <p class="section-sub">Tell us what you need built. We build it, free, always.</p>
+  </div>
+  <form id="toolRequestForm" style="max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:14px;">
+    <input type="text" id="trName" placeholder="Full Name" required>
+    <input type="email" id="trEmail" placeholder="Email Address" required>
+    <select id="trType" required>
+      <option value="" disabled selected>What do you need?</option>
+      <option value="tool">Custom Tool</option>
+      <option value="automation">Automation</option>
+      <option value="n8n_workflow">n8n Workflow</option>
+      <option value="agent">AI Agent</option>
+      <option value="other">Other</option>
+    </select>
+    <textarea id="trDescription" rows="4" placeholder="Describe what you want built..." required></textarea>
+    <button type="submit" id="trSubmitBtn">Request It Free</button>
+    <div id="trSuccess" style="display:none;text-align:center;padding:14px 0;">Request received! We'll email you.</div>
+    <div id="trError" style="display:none;color:#ff5555;text-align:center;"></div>
+  </form>
+</section>
+
+<script>
+(function () {
+  const API_URL = "https://YOUR-VERCEL-PROJECT.vercel.app/api/request-tool"; // replace after deploy
+  const form = document.getElementById('toolRequestForm');
+  const btn = document.getElementById('trSubmitBtn');
+  const success = document.getElementById('trSuccess');
+  const errorBox = document.getElementById('trError');
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    errorBox.style.display = 'none';
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+
+    const payload = {
+      name: document.getElementById('trName').value.trim(),
+      email: document.getElementById('trEmail').value.trim(),
+      tool_type: document.getElementById('trType').value,
+      description: document.getElementById('trDescription').value.trim()
+    };
+
+    try {
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Request failed');
+
+      form.style.display = 'none';
+      success.style.display = 'block';
+    } catch (err) {
+      errorBox.textContent = err.message;
+      errorBox.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Request It Free';
+    }
+  });
+})();
+</script>
