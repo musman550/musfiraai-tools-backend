@@ -1,0 +1,18 @@
+name: Keep Supabase Project Alive
+
+on:
+  schedule:
+    # Runs every day at 06:00 UTC — well under Supabase's ~1-week inactivity pause window
+    - cron: '0 6 * * *'
+  workflow_dispatch: {}   # lets you also trigger it manually from the Actions tab
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping request-status function
+        run: |
+          curl -sS -X POST "https://vfumvywhiwrgmankfqbg.supabase.co/functions/v1/request-status" \
+            -H "Content-Type: application/json" \
+            -d '{"email":"keepalive@musfiraai.internal"}' \
+            -o /dev/null -w "HTTP %{http_code}\n"
